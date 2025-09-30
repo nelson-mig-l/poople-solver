@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="module" src="https://pyscript.net/releases/2025.8.1/core.js"></script>
+    <script type="module">
+        const loading = document.getElementById('loading');
+        addEventListener('py:ready', () => loading.close());
+        loading.showModal();
+    </script>
+    <script type="py" src="./kupa/bfs.py"></script>
+    <link rel="stylesheet" href="kupa/styles.css">
+    <title>PyScript Poople Solver</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%221em%22 font-size=%2280%22>💩</text></svg>">
+</head>
+<body>
+<dialog id="loading">
+    <h1>Loading...</h1>
+</dialog>
+<h1>Poople Solver</h1>
+<p>No 💩javascript used, just 🐍python!</p>
+<input id="word" type="text"/>
+<button id="solve_button" disabled>Solve</button>
+<hr/>
+<h3 id="solution-words"></h3>
+<h5 id="solution-length"></h5>
+
+<script type="py">
+    from pyscript import display, document, fetch, when, window
+    import json
+
+
+    print("Hello from PyScript!")
+    response = await fetch("./kupa/data.json", method="GET").text()
+    graph = json.loads(response)
+
+
+    @when("click", "#solve_button")
+    def click_handler(event):
+        word = document.getElementById("word").value
+        path = solve(graph, word.upper())
+        if path:
+            display(" ".join(f"{n}" for n in path), target="solution-words", append=False)
+            display(f"{len(path)-1} guesses", target="solution-length", append=False)
+        else:
+            display("No solution found.", target="solution-words", append=False)
+            display("", target="solution-length", append=False)
+
+
+    @when("input", "#word")
+    def input_handler(event):
+        word = document.getElementById("word").value
+        document.getElementById("solve_button").disabled = (len(word) != 4)
+
+</script>
+</body>
+</html>
